@@ -30,25 +30,13 @@ final class ViewController: UIViewController, UITextFieldDelegate {
             self?.validationLabel.textColor = color
         }.store(in: &cancellables)
 
-        idTextField
-            .textPublisher //AnyPublisher<String?, Never>
-            .compactMap { $0 } //String?のnil消去
-            .sink { [weak self] text in
-                guard let self = self else { return }
-                self.viewModel.textChangedTo(id: text, pass: self.passwordTextField.text)
-                // Viewmodelを介してmodelにvalidationさせる
-
-            }.store(in: &cancellables)
-
-        passwordTextField
-            .textPublisher //AnyPublisher<String?, Never>
-            .compactMap { $0 } //String?のnil消去
-            .sink { [weak self] text in
-                guard let self = self else { return }
-                self.viewModel.textChangedTo(id: self.idTextField.text, pass: text) // Viewmodelを介してmodelにvalidationさせる
-
-            }.store(in: &cancellables)
-
+        // MARK: CombineLatestを使ってどちらかのPublisherが更新された場合に動くようにする(Zipは両方の更新で動くため不可)
+        Publishers.CombineLatest(idTextField.textPublisher, passwordTextField.textPublisher)
+            .sink(receiveValue: {[weak self] (id, pass) in
+                guard let self else { return }
+                print("sinked")
+                self.viewModel.textChangedTo(id: id, pass: pass)
+            }).store(in: &cancellables)
     }
 }
 
