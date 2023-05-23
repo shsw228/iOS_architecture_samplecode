@@ -6,38 +6,47 @@
 //  Copyright © 2018年 Kenji Tanaka. All rights reserved.
 //
 
-import RxSwift
+import Combine
 
 enum ModelError: Error {
     case invalidId
     case invalidPassword
     case invalidIdAndPassword
 }
-
+typealias ModelResult = Result<Void, ModelError>
 protocol ModelProtocol {
-    func validate(idText: String?, passwordText: String?) -> Observable<Void>
+    var validatePublisher: AnyPublisher<ModelResult,Never> { get } // ViewModelがvalidate結果を監視するためのプロパティ
+    func validate(idText: String?, passwordText: String?)
 }
 
 final class Model: ModelProtocol {
-    func validate(idText: String?, passwordText: String?) -> Observable<Void> {
+private let validateSubject = PassthroughSubject<ModelResult, Never>()
+
+    var validatePublisher: AnyPublisher<ModelResult, Never> {
+        return validateSubject.eraseToAnyPublisher()
+    }
+
+    func validate(idText: String?, passwordText: String?){
+        let result: ModelResult
         switch (idText, passwordText) {
         case (.none, .none):
-            return Observable.error(ModelError.invalidIdAndPassword)
+            result = .failure(.invalidIdAndPassword)
         case (.none, .some):
-            return Observable.error(ModelError.invalidId)
+            result = .failure(.invalidId)
         case (.some, .none):
-            return Observable.error(ModelError.invalidPassword)
+            result = .failure(.invalidPassword)
         case (let idText?, let passwordText?):
             switch (idText.isEmpty, passwordText.isEmpty) {
             case (true, true):
-                return Observable.error(ModelError.invalidIdAndPassword)
+                result = .failure(.invalidIdAndPassword)
             case (false, false):
-                return Observable.just(())
+                result = .success(())
             case (true, false):
-                return Observable.error(ModelError.invalidId)
+                result = .failure(.invalidId)
             case (false, true):
-                return Observable.error(ModelError.invalidPassword)
+                result = .failure(.invalidPassword)
             }
         }
+        validateSubject.send(result) // validateSubjectにresultを反映する
     }
 }

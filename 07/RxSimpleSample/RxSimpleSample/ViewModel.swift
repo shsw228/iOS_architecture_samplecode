@@ -7,50 +7,40 @@
 //
 
 import UIKit
-import RxSwift
+import Combine
+import CombineCocoa
 
 final class ViewModel {
-    let validationText: Observable<String>
-    let loadLabelColor: Observable<UIColor>
+    private let model:ModelProtocol
+    private var cancellables = Set<AnyCancellable>()
 
-    init(idTextObservable: Observable<String?>,
-         passwordTextObservable: Observable<String?>,
-         model: ModelProtocol) {
-        let event = Observable
-            .combineLatest(idTextObservable, passwordTextObservable)
-            .skip(1)
-            .flatMap { idText, passwordText -> Observable<Event<Void>> in
-                return model
-                    .validate(idText: idText, passwordText: passwordText)
-                    .materialize()
-            }
-            .share()
+    // MARK: ViewModel内で値を保持しているプロパティ
+    private let validationTextSubject = PassthroughSubject<String, Never>()
+    private let loadLabelColorSubject = PassthroughSubject<UIColor, Never>()
 
-        self.validationText = event
-            .flatMap { event -> Observable<String> in
-                switch event {
-                case .next:
-                    return .just("OK!!!")
-                case let .error(error as ModelError):
-                    return .just(error.errorText)
-                case .error, .completed:
-                    return .empty()
+    //MARK: VCへの公開用プロパティ
+    var validatedText: AnyPublisher<String,Never> {
+        return validationTextSubject.eraseToAnyPublisher()
+    }
+    var loadLabelColor: AnyPublisher<UIColor,Never> {
+        return loadLabelColorSubject.eraseToAnyPublisher()
+    }
+
+    init(model: ModelProtocol = Model()) {
+        self.model = model
+        model.validatePublisher //model内で公開しているvalidatePublisherをViewModelで購読する
+            .sink { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success():
+                    self.validationTextSubject.send("OK")
+                    self.loadLabelColorSubject.send(.green)
+                case .failure(let error):
+                    self.validationTextSubject.send(error.errorText)
+                    self.loadLabelColorSubject.send(.red)
                 }
             }
-            .startWith("IDとPasswordを入力してください。")
-
-
-        self.loadLabelColor = event
-            .flatMap { event -> Observable<UIColor> in
-                switch event {
-                case .next:
-                    return .just(.green)
-                case .error:
-                    return .just(.red)
-                case .completed:
-                    return .empty()
-                }
-        }
+            .store(in: &cancellables)
     }
 }
 
