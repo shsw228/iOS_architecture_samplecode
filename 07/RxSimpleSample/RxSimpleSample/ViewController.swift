@@ -8,6 +8,7 @@
 
 import UIKit
 import Combine
+import CombineCocoa
 
 final class ViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet private weak var idTextField: UITextField!
@@ -34,9 +35,20 @@ final class ViewController: UIViewController, UITextFieldDelegate {
             .compactMap { $0 } //String?のnil消去
             .sink { [weak self] text in
                 guard let self = self else { return }
-                self.viewModel.textChangedTo(id: text, pass: nil) // Viewmodelを介してmodelにvalidationさせる
+                self.viewModel.textChangedTo(id: text, pass: self.passwordTextField.text)
+                // Viewmodelを介してmodelにvalidationさせる
 
             }.store(in: &cancellables)
+
+        passwordTextField
+            .textPublisher //AnyPublisher<String?, Never>
+            .compactMap { $0 } //String?のnil消去
+            .sink { [weak self] text in
+                guard let self = self else { return }
+                self.viewModel.textChangedTo(id: self.idTextField.text, pass: text) // Viewmodelを介してmodelにvalidationさせる
+
+            }.store(in: &cancellables)
+
     }
 }
 
