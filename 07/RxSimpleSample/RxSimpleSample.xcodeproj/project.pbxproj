@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,7 @@
 		B50F97EC216AE9600000156F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B50F97EA216AE9600000156F /* LaunchScreen.storyboard */; };
 		B50F9802216B1E470000156F /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F9801216B1E470000156F /* ViewModel.swift */; };
 		B50F9804216B1E510000156F /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F9803216B1E510000156F /* Model.swift */; };
+		B7CA8F1D2A1D01F800CC342C /* CombineCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = B7CA8F1C2A1D01F800CC342C /* CombineCocoa */; };
 		D31F7B9FC213D9D22799EC09 /* ViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D31F73FF49D8587362A1E27D /* ViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B7CA8F1D2A1D01F800CC342C /* CombineCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +120,9 @@
 			dependencies = (
 			);
 			name = RxSimpleSample;
+			packageProductDependencies = (
+				B7CA8F1C2A1D01F800CC342C /* CombineCocoa */,
+			);
 			productName = RxSimpleSample;
 			productReference = B50F97DE216AE95F0000156F /* RxSimpleSample.app */;
 			productType = "com.apple.product-type.application";
@@ -170,6 +175,9 @@
 				Base,
 			);
 			mainGroup = B50F97D5216AE95F0000156F;
+			packageReferences = (
+				B7CA8F1B2A1D01F800CC342C /* XCRemoteSwiftPackageReference "CombineCocoa" */,
+			);
 			productRefGroup = B50F97DF216AE95F0000156F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -372,14 +380,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = RxSimpleSample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.peaks.ktanaka117.RxSimpleSample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -389,14 +400,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = RxSimpleSample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.peaks.ktanaka117.RxSimpleSample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -473,6 +487,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B7CA8F1B2A1D01F800CC342C /* XCRemoteSwiftPackageReference "CombineCocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CombineCommunity/CombineCocoa";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B7CA8F1C2A1D01F800CC342C /* CombineCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B7CA8F1B2A1D01F800CC342C /* XCRemoteSwiftPackageReference "CombineCocoa" */;
+			productName = CombineCocoa;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B50F97D6216AE95F0000156F /* Project object */;
 }
