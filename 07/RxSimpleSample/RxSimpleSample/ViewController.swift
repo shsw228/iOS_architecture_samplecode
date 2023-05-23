@@ -7,37 +7,36 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
+import Combine
 
 final class ViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet private weak var idTextField: UITextField!
     @IBOutlet private weak var passwordTextField: UITextField!
     @IBOutlet private weak var validationLabel: UILabel!
 
-    private lazy var viewModel = ViewModel(
-        idTextObservable: idTextField.rx.text.asObservable(),
-        passwordTextObservable: passwordTextField.rx.text.asObservable(),
-        model: Model()
-    )
-    private let disposeBag = DisposeBag()
+    private var viewModel = ViewModel()
+    private var cancellables = Set<AnyCancellable>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        viewModel.validationText
-            .bind(to: validationLabel.rx.text)
-            .disposed(by: disposeBag)
+        // MARK: viewModelの公開しているvalidatedText,loadLabelColorを購読してUIに反映する
+        viewModel.validatedText.sink { [weak self] validatedValue in
+            self?.validationLabel.text = validatedValue
+        }.store(in: &cancellables)
 
-        viewModel.loadLabelColor
-            .bind(to: loadLabelColor)
-            .disposed(by: disposeBag)
-    }
+        viewModel.loadLabelColor.sink { [weak self] color in
+            self?.validationLabel.textColor = color
+        }.store(in: &cancellables)
 
-    private var loadLabelColor: Binder<UIColor> {
-        return Binder(self) { me, color in
-            me.validationLabel.textColor = color
-        }
+        idTextField
+            .textPublisher //AnyPublisher<String?, Never>
+            .compactMap { $0 } //String?のnil消去
+            .sink { [weak self] text in
+                guard let self = self else { return }
+                self.viewModel.textChangedTo(id: text, pass: nil) // Viewmodelを介してmodelにvalidationさせる
+
+            }.store(in: &cancellables)
     }
 }
 

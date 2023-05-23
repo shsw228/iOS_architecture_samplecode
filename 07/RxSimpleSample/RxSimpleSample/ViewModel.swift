@@ -42,6 +42,10 @@ final class ViewModel {
             }
             .store(in: &cancellables)
     }
+
+    public func textChangedTo(id:String?, pass:String?) {
+        model.validate(idText:id, passwordText: pass)
+    }
 }
 
 extension ModelError {
